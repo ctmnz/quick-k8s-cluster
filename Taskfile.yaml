@@ -1,0 +1,18 @@
+version: '3'
+env:
+  TaskInfo: "Create"
+
+tasks:
+  build-poc:
+    cmds:
+      - kind create cluster --name=quick-cluster --config quick-cluster.yaml
+      - kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+      - kubectl label nodes quick-cluster-worker ingress-ready=true
+      - kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s
+      - kubectl apply -f app01.yaml
+      - echo "You can now visit the poc address http://app01.127.0.0.1.nip.io/"
+
+  destroy-poc:
+    cmds:
+      - kind delete cluster --name quick-cluster
+
