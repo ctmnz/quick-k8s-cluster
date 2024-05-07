@@ -6,11 +6,11 @@ Hence, you need to insall `go-task`. You can do it following the [instructions n
 
 ## Start the cluster
 ```
-task build-poc
+task build-it
 ```
 
 ## Destroy the cluster
 ```
-task destroy-poc
+task destroy-it
 ```
 
