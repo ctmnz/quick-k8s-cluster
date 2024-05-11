@@ -11,6 +11,17 @@ tasks:
       - kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=190s
       - kubectl apply -f app01.yaml
       - echo "You can now visit the poc address http://app01.127.0.0.1.nip.io/"
+  argocd-it:
+    cmds:
+      - kubectl create namespace argocd
+      - kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      - kubectl apply -f argocd/argocd-ingress.yaml
+      - kubectl wait --namespace argocd --for=condition=ready pod --selector=app.kubernetes.io/name=argocd-server --timeout=190s
+      - kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+      - sleep 5
+      - argocd login argocd.127.0.0.1.nip.io --grpc-web --insecure --username admin --password $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo)
+      - argocd account update-password --account admin --grpc-web --insecure --current-password $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo) --new-password adminpass
+      - echo "You can now visit the poc address https://argocd.127.0.0.1.nip.io/ user admin, password adminpass"
 
   destroy-it:
     cmds:
